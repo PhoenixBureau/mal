@@ -2,13 +2,16 @@ import pegs
 
 var lines = @[
     "tuesday",
+    "  )",
     "gggg",
     "[",
     "  ~@",
     "  \"hey \\\"there\"",
     "  ;heyeyrerer  "]
 
+
 var p = peg"""
+
     Token <-  \s * (
 
     {'~@'} 

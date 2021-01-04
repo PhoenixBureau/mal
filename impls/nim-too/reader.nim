@@ -48,6 +48,7 @@ proc peek(reader: Reader): Token =
 proc tokenize(input: string): seq[Token] =
     result = @[]
     for substr in findAll(input, p):
+        echo "+", substr, "-"
         result.add(Token(substr))
 
 
