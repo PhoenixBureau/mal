@@ -70,6 +70,9 @@ proc read_list(reader: var Reader): MalType =
 
 
 proc read_form(reader: var Reader): MalType =
+    if reader.eof:
+        # Blank or empty input, not really an error.
+        return MalType(kind: mttParseError, errorMessage: "")
     case peek(reader)[0]
     of '(':
         result = read_list(reader)
@@ -77,12 +80,15 @@ proc read_form(reader: var Reader): MalType =
         result = read_atom(reader)
 
 
+proc tokens_to_reader(tokens: seq[Token]): Reader =
+    var reader: Reader = (
+        tokens: tokens,
+        position: 0,
+        eof: tokens.len == 0
+        )
+    reader
+
+
 proc read_str*(str: string): MalType =
-    var reader: Reader = (tokens: tokenize(str), position: 0, eof: false)  # TODO not just false eh?
-    read_form(reader)
-
-
-proc read_tokens*(tokens: seq[Token]): MalType =
-    assert tokens.len > 0
-    var reader: Reader = (tokens: tokens, position: 0, eof: false)
+    var reader = tokens_to_reader(tokenize(str))
     read_form(reader)
