@@ -115,7 +115,7 @@ proc read_hashmap(reader: var Reader): MalType =
 proc read_strlit(reader: var Reader): MalType =
     var tok = next(reader)
     assert tok[0] == '"'
-    if tok.len == 1 or tok[tok.len - 1] != '"':
+    if tok.len == 1 or tok[tok.len - 1] != '"' or tok =~ peg"[^\\]*(\\\\)*\\":
         return MalType(kind: mttParseError, errorMessage: "EOF while scanning string.")
     tok = tok.substr(1, tok.len - 2)  # peel off double-quotes
     tok = tok.multiReplace(
