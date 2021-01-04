@@ -79,6 +79,18 @@ proc read_strlit(reader: var Reader): MalType =
         result = MalType(kind: mttStr, strVal: tok)
 
 
+proc read_str*(str: string): MalType
+
+
+proc read_quote(reader: var Reader): MalType =
+    var tok = next(reader)
+    assert tok == "'"
+    let quoted_item = read_form(reader)
+    let quote = read_str("(quote foo)")
+    quote.listVal[1] = quoted_item
+    quote
+
+
 proc read_form(reader: var Reader): MalType =
     if reader.eof:
         # Blank or empty input, not really an error.
@@ -88,6 +100,8 @@ proc read_form(reader: var Reader): MalType =
         result = read_list(reader)
     of '"':
         result = read_strlit(reader)
+    of '\'':
+        result = read_quote(reader)
     else:
         result = read_atom(reader)
 
