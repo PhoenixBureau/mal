@@ -1,4 +1,4 @@
-
+import tables
 
 type
     MalTypeType* = enum
@@ -6,6 +6,7 @@ type
         mttFalse,
         mttInt,
         mttKeyword,
+        mttHashmap,
         mttList,
         mttNil,
         mttParseError,
@@ -26,6 +27,8 @@ type
             listVal*: seq[MalType]
         of mttVector:
             vectorVal*: seq[MalType]
+        of mttHashmap:
+            hashmapVal*: Table[string, MalType]
         of mttParseError:
             errorMessage*: string
         of mttStr:
@@ -33,6 +36,12 @@ type
         of mttNil, mttTrue, mttFalse:
             nil
 
+
+proc hashmap_items*(hashmap: Table[string, MalType]): seq[MalType] =
+    result = @[]
+    for k, v in hashmap.pairs:
+        result.add MalType(kind: mttKeyword, keyVal: k)
+        result.add v
 
 # Singleton values for these types.
 

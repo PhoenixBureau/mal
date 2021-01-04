@@ -1,4 +1,4 @@
-import pegs, strutils, types1
+import pegs, strutils, tables, types1
 
 type
 
@@ -83,6 +83,33 @@ proc read_vector(reader: var Reader): MalType =
     MalType(kind: mttVector, vectorVal: items)
 
 
+proc read_hashmap(reader: var Reader): MalType =
+    var items = initTable[string, MalType]()
+    var key: string
+    discard next(reader)  # Skip the '{'.
+    while true:
+        if reader.eof:
+            return MalType(kind: mttParseError, errorMessage: "EOF while scanning hashmap.")
+        
+        if peek(reader) == "}":
+            discard next(reader)  # Skip the '}'.
+            break
+
+        var keyword = read_form(reader)
+        case keyword.kind
+        of mttKeyword:
+            key = keyword.keyVal
+        else:
+            return MalType(kind: mttParseError, errorMessage: "Not a keyword in hashmap.")
+
+        if reader.eof:
+            return MalType(kind: mttParseError, errorMessage: "EOF while scanning for value in hashmap.")
+
+        items[key] = read_form(reader)
+
+    MalType(kind: mttHashmap, hashmapVal: items)
+
+
 proc read_strlit(reader: var Reader): MalType =
     var tok = next(reader)
     assert tok[0] == '"'
@@ -112,6 +139,7 @@ proc read_form(reader: var Reader): MalType =
     case peek(reader)[0]
     of '(': result = read_list(reader)
     of '[': result = read_vector(reader)
+    of '{': result = read_hashmap(reader)
     of '"': result = read_strlit(reader)
     of ':': result = read_keyword(reader)
     of '\'': result = read_quote(reader, "(quote)")

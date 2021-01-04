@@ -11,6 +11,8 @@ proc pr_str*(thing: MalType): string =
         result = "(" & join(map(thing.listVal, pr_str), " ") & ")"
     of mttVector:
         result = "[" & join(map(thing.vectorVal, pr_str), " ") & "]"
+    of mttHashmap:
+        result = "{" & join(map(hashmap_items(thing.hashmapVal), pr_str), " ") & "}"
     of mttParseError:
         result = thing.errorMessage
     of mttStr:
