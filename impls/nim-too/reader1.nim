@@ -53,11 +53,6 @@ proc read_atom(reader: var Reader): MalType =
         result = mal_true
     elif tok == "false":
         result = mal_false
-    elif tok[0] == '"':
-        if tok.len == 1 or tok[tok.len - 1] != '"':
-            result = MalType(kind: mttParseError, errorMessage: "EOF while scanning string.")
-        else:
-            result = MalType(kind: mttStr, strVal: tok)
     else:
         result = MalType(kind: mttAtom, atomVal: tok)
 
@@ -75,6 +70,15 @@ proc read_list(reader: var Reader): MalType =
     result = MalType(kind: mttList, listVal: items)
 
 
+proc read_strlit(reader: var Reader): MalType =
+    var tok = next(reader)
+    assert tok[0] == '"'
+    if tok.len == 1 or tok[tok.len - 1] != '"':
+        result = MalType(kind: mttParseError, errorMessage: "EOF while scanning string.")
+    else:
+        result = MalType(kind: mttStr, strVal: tok)
+
+
 proc read_form(reader: var Reader): MalType =
     if reader.eof:
         # Blank or empty input, not really an error.
@@ -82,6 +86,8 @@ proc read_form(reader: var Reader): MalType =
     case peek(reader)[0]
     of '(':
         result = read_list(reader)
+    of '"':
+        result = read_strlit(reader)
     else:
         result = read_atom(reader)
 
