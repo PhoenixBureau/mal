@@ -112,10 +112,14 @@ proc read_hashmap(reader: var Reader): MalType =
     MalType(kind: mttHashmap, hashmapVal: items)
 
 
+proc rotten_string(tok: Token): bool =
+    tok.len == 1 or tok[tok.len - 1] != '"' or tok.substr(tok.len - 2) == "\\\""
+
+
 proc read_strlit(reader: var Reader): MalType =
     var tok = next(reader)
     assert tok[0] == '"'
-    if tok.len == 1 or tok[tok.len - 1] != '"':
+    if rotten_string(tok):
         result = MalType(kind: mttParseError, errorMessage: "EOF while scanning string.")
     else:
         result = MalType(kind: mttStr, strVal: tok)
@@ -146,6 +150,7 @@ proc read_form(reader: var Reader): MalType =
     of ':': result = read_keyword(reader)
     of '\'': result = read_quote(reader, "(quote)")
     of '`': result = read_quote(reader, "(quasiquote)")
+    of '@': result = read_quote(reader, "(deref)")
     of '~':
         if peek(reader) == "~@":
             result = read_quote(reader, "(splice-unquote)")
