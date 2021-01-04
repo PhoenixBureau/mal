@@ -1,4 +1,4 @@
-import rdstdin, printer, reader, types
+import rdstdin, strutils, printer, reader, types
 
 proc read(str: string): MalType =
   read_str(str)
@@ -9,7 +9,10 @@ proc print(exp: MalType): string =
   pr_str(exp)
 
 proc rep(input: string): string =
-  print(eval(read(input)))
+  if isEmptyOrWhitespace(input):
+    result = ""
+  else:
+    result = print(eval(read(input)))
 
 
 # Handle Ctrl-C by raising an IOError to break out of the mainloop
