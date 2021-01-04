@@ -51,5 +51,20 @@ proc tokenize(input: string): seq[Token] =
         result.add(Token(substr))
 
 
+
+proc read_atom(reader: Reader): MalType =
+    result = MalType(kind: mttAtom, atomVal: "")
+
+
+proc read_list(reader: Reader): MalType =
+    result = MalType(kind: mttList, listVal: @[])
+
+
 proc read_form(reader: Reader): MalType =
     result = MalType(kind: mttList, listVal: @[])
+    let token = peek(reader)
+    case token[0]
+    of '(':
+        return read_list(reader)
+    else:
+        return read_atom(reader)

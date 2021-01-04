@@ -2,13 +2,13 @@
 
 type
     MalTypeType* = enum
-        mttInt,
+        mttAtom,
         mttList
 
     MalType* = ref object
         case kind*: MalTypeType
-        of mttInt:
-            intVal*: int
+        of mttAtom:
+            atomVal*: string
         of mttList:
             listVal*: seq[MalType]
 
