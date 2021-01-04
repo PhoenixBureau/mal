@@ -91,19 +91,25 @@ proc read_quote(reader: var Reader): MalType =
     quote
 
 
+proc read_quasiquote(reader: var Reader): MalType =
+    var tok = next(reader)
+    assert tok == "`"
+    let quoted_item = read_form(reader)
+    let quote = read_str("(quasiquote foo)")
+    quote.listVal[1] = quoted_item
+    quote
+
+
 proc read_form(reader: var Reader): MalType =
     if reader.eof:
         # Blank or empty input, not really an error.
         return MalType(kind: mttParseError, errorMessage: "")
     case peek(reader)[0]
-    of '(':
-        result = read_list(reader)
-    of '"':
-        result = read_strlit(reader)
-    of '\'':
-        result = read_quote(reader)
-    else:
-        result = read_atom(reader)
+    of '(': result = read_list(reader)
+    of '"': result = read_strlit(reader)
+    of '\'': result = read_quote(reader)
+    of '`': result = read_quasiquote(reader)
+    else: result = read_atom(reader)
 
 
 proc tokens_to_reader(tokens: seq[Token]): Reader =
