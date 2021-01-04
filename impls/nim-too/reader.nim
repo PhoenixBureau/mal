@@ -8,6 +8,34 @@ type
     tokens : seq[Token]
     position: uint
 
+var p = peg"""
+
+    Token <-  \s * (
+
+    {'~@'} 
+    
+    /
+    
+    {[\[\]{}()'`~^@]}
+
+    /
+
+    { "\"" ("\\" . / [^"])* "\"" }
+
+    /
+
+    { ';' .* }
+
+    /
+
+    { (!NonSpecial .)* }
+    
+    )
+    
+    NonSpecial <- \s / '[' / ']' / '{' / '}' / '(' / ['] / '"' / '`' / ',' / ';' / ')'
+    
+    """
+
 
 proc next(reader: var Reader): Token =
     result = reader.tokens[reader.position]
@@ -18,4 +46,6 @@ proc peek(reader: Reader): Token =
 
 
 proc tokenize(input: string): seq[Token] =
-    @[Token("")]
+    result = @[]
+    for substr in findAll(input, p):
+        result.add(Token(substr))
