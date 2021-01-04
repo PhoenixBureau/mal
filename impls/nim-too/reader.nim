@@ -51,19 +51,26 @@ proc tokenize(input: string): seq[Token] =
         result.add(Token(substr))
 
 
+proc read_form(reader: var Reader): MalType
 
-proc read_atom(reader: Reader): MalType =
+
+proc read_atom(reader: var Reader): MalType =
     result = MalType(kind: mttAtom, atomVal: "")
 
 
-proc read_list(reader: Reader): MalType =
-    result = MalType(kind: mttList, listVal: @[])
+proc read_list(reader: var Reader): MalType =
+    var items : seq[MalType] = @[]
+    discard next(reader)  # Skip the '('.
+    while true:
+        if peek(reader) == ")":
+            discard next(reader)  # Skip the ')'.
+            break
+        items.add(read_form(reader))
+    result = MalType(kind: mttList, listVal: items)
 
 
-proc read_form(reader: Reader): MalType =
-    result = MalType(kind: mttList, listVal: @[])
-    let token = peek(reader)
-    case token[0]
+proc read_form(reader: var Reader): MalType =
+    case peek(reader)[0]
     of '(':
         return read_list(reader)
     else:
