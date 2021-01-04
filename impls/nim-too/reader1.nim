@@ -67,7 +67,7 @@ proc read_list(reader: var Reader): MalType =
             discard next(reader)  # Skip the ')'.
             break
         items.add(read_form(reader))
-    result = MalType(kind: mttList, listVal: items)
+    MalType(kind: mttList, listVal: items)
 
 
 proc read_strlit(reader: var Reader): MalType =
@@ -88,6 +88,10 @@ proc read_quote(reader: var Reader, q: string): MalType =
     result.listVal.add read_form(reader)
 
 
+proc read_keyword(reader: var Reader): MalType =
+    MalType(kind: mttKeyword, keyVal: next(reader).substr(1))
+
+
 proc read_form(reader: var Reader): MalType =
     if reader.eof:
         # Blank or empty input, not really an error.
@@ -95,6 +99,7 @@ proc read_form(reader: var Reader): MalType =
     case peek(reader)[0]
     of '(': result = read_list(reader)
     of '"': result = read_strlit(reader)
+    of ':': result = read_keyword(reader)
     of '\'': result = read_quote(reader, "(quote)")
     of '`': result = read_quote(reader, "(quasiquote)")
     of '~':

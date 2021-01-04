@@ -19,3 +19,5 @@ proc pr_str*(thing: MalType): string =
         result = "true"
     of mttFalse:
         result = "false"
+    of mttKeyword:
+        result = ":" & thing.keyVal

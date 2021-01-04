@@ -3,13 +3,14 @@
 type
     MalTypeType* = enum
         mttAtom,
+        mttFalse,
         mttInt,
+        mttKeyword,
         mttList,
+        mttNil,
         mttParseError,
         mttStr,
-        mttNil,
-        mttTrue,
-        mttFalse
+        mttTrue
 
 
     MalType* = ref object
@@ -18,6 +19,8 @@ type
             atomVal*: string
         of mttInt:
             intVal*: int
+        of mttKeyword:
+            keyVal*: string
         of mttList:
             listVal*: seq[MalType]
         of mttParseError:
