@@ -1,4 +1,4 @@
-import rdstdin
+import rdstdin, reader
 
 proc read(str: string): string = str
 

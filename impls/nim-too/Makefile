@@ -1,11 +1,12 @@
 #####################
 
-# SOURCES_BASE = types.nim reader.nim printer.nim
+SOURCES_BASE = reader.nim
+#  types.nim printer.nim
 # SOURCES_REBUILD = $(SOURCES_BASE) env.nim core.nim
 
 #####################
 
-SRCS = step0_repl.nim
+SRCS = step0_repl.nim step1_read_print.nim
 BINS = $(SRCS:%.nim=%)
 
 #####################
@@ -17,7 +18,7 @@ dist: mal
 mal: $(word $(words $(BINS)),$(BINS))
 	cp $< $@
 
-$(BINS): %: %.nim
+$(BINS): %: %.nim $(SOURCES_BASE)
 	nim -d:release --nimcache:nimcache-$@ c $@
 
 clean:
