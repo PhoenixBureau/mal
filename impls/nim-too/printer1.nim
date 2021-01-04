@@ -16,7 +16,7 @@ proc pr_str*(thing: MalType): string =
     of mttParseError:
         result = thing.errorMessage
     of mttStr:
-        result = "\"" & thing.strVal.replace(r"\", r"\\").replace("\n", r"\n") & "\""
+        result = "\"" & thing.strVal.multiReplace(("\\", "\\\\"), ("\"", "\\\""), ("\n", "\\n")) & "\""
     of mttNil:
         result = "nil"
     of mttTrue:
