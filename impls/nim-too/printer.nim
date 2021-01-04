@@ -9,3 +9,5 @@ proc pr_str*(thing: MalType): string =
         result = $ thing.intVal
     of mttList:
         result = "(" & join(map(thing.listVal, pr_str), " ") & ")"
+    of mttParseError:
+        result = thing.errorMessage

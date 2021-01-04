@@ -1,7 +1,7 @@
 import rdstdin, strutils, printer, reader, types
 
-proc read(str: string): MalType =
-  read_str(str)
+proc read(tokens: seq[Token]): MalType =
+  read_tokens(tokens)
 
 proc eval(ast: MalType): MalType = ast
 
@@ -10,9 +10,11 @@ proc print(exp: MalType): string =
 
 proc rep(input: string): string =
   if isEmptyOrWhitespace(input):
-    result = ""
-  else:
-    result = print(eval(read(input)))
+    return ""
+  var tokens: seq[Token] = tokenize(input)
+  if tokens.len == 0:
+    return ""
+  print(eval(read(tokens)))
 
 
 # Handle Ctrl-C by raising an IOError to break out of the mainloop

@@ -2,11 +2,12 @@ import pegs, strutils, types
 
 type
 
-  Token = string
+  Token* = string
 
   Reader = tuple
     tokens : seq[Token]
     position: int
+    eof: bool
 
 var p = peg"""
 
@@ -23,15 +24,16 @@ var p = peg"""
     """
 
 
-proc next(reader: var Reader): Token =
-    result = reader.tokens[reader.position]
-    inc reader.position
-
 proc peek(reader: Reader): Token =
     reader.tokens[reader.position]
 
 
-proc tokenize(input: string): seq[Token] =
+proc next(reader: var Reader): Token =
+    result = peek(reader)
+    inc reader.position
+    reader.eof = reader.position >= reader.tokens.len
+
+proc tokenize*(input: string): seq[Token] =
     result = @[]
     for substr in findAll(input, p):
         result.add(Token(strip(substr)))
@@ -52,6 +54,8 @@ proc read_list(reader: var Reader): MalType =
     var items : seq[MalType] = @[]
     discard next(reader)  # Skip the '('.
     while true:
+        if reader.eof:
+            return MalType(kind: mttParseError, errorMessage: "EOF while scanning list.")
         if peek(reader) == ")":
             discard next(reader)  # Skip the ')'.
             break
@@ -68,6 +72,11 @@ proc read_form(reader: var Reader): MalType =
 
 
 proc read_str*(str: string): MalType =
-    var reader: Reader = (tokens: tokenize(str), position: 0)
+    var reader: Reader = (tokens: tokenize(str), position: 0, eof: false)  # TODO not just false eh?
     read_form(reader)
 
+
+proc read_tokens*(tokens: seq[Token]): MalType =
+    assert tokens.len > 0
+    var reader: Reader = (tokens: tokens, position: 0, eof: false)
+    read_form(reader)

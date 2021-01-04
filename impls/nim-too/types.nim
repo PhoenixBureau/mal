@@ -4,7 +4,8 @@ type
     MalTypeType* = enum
         mttAtom,
         mttInt,
-        mttList
+        mttList,
+        mttParseError
 
     MalType* = ref object
         case kind*: MalTypeType
@@ -14,4 +15,6 @@ type
             intVal*: int
         of mttList:
             listVal*: seq[MalType]
+        of mttParseError:
+            errorMessage*: string
 
