@@ -1,4 +1,4 @@
-import pegs
+import pegs, types
 
 type
 
@@ -49,3 +49,7 @@ proc tokenize(input: string): seq[Token] =
     result = @[]
     for substr in findAll(input, p):
         result.add(Token(substr))
+
+
+proc read_form(reader: Reader): MalType =
+    result = MalType(kind: mttList, listVal: @[])
