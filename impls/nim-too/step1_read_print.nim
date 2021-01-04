@@ -1,4 +1,4 @@
-import rdstdin, strutils, printer, reader, types
+import rdstdin, strutils, printer1, reader1, types1
 
 proc read(tokens: seq[Token]): MalType =
   read_tokens(tokens)

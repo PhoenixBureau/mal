@@ -1,4 +1,4 @@
-import pegs, strutils, types
+import pegs, strutils, types1
 
 type
 

@@ -1,4 +1,4 @@
-import sequtils, strutils, types
+import sequtils, strutils, types1
 
 
 proc pr_str*(thing: MalType): string =
