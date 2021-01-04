@@ -6,7 +6,11 @@ type
         mttInt,
         mttList,
         mttParseError,
-        mttStr
+        mttStr,
+        mttNil,
+        mttTrue,
+        mttFalse
+
 
     MalType* = ref object
         case kind*: MalTypeType
@@ -20,4 +24,12 @@ type
             errorMessage*: string
         of mttStr:
             strVal*: string
+        of mttNil, mttTrue, mttFalse:
+            nil
 
+
+# Singleton values for these types.
+
+let mal_nil* = MalType(kind: mttNil)
+let mal_true* = MalType(kind: mttTrue)
+let mal_false* = MalType(kind: mttFalse)

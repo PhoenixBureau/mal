@@ -13,3 +13,9 @@ proc pr_str*(thing: MalType): string =
         result = thing.errorMessage
     of mttStr:
         result = thing.strVal
+    of mttNil:
+        result = "nil"
+    of mttTrue:
+        result = "true"
+    of mttFalse:
+        result = "false"

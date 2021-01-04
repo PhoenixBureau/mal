@@ -47,6 +47,12 @@ proc read_atom(reader: var Reader): MalType =
     var tok = next(reader)
     if tok =~ peg"\d+":
         result = MalType(kind: mttInt, intVal: parseInt(tok))
+    elif tok == "nil":
+        result = mal_nil
+    elif tok == "true":
+        result = mal_true
+    elif tok == "false":
+        result = mal_false
     elif tok[0] == '"':
         if tok.len == 1 or tok[tok.len - 1] != '"':
             result = MalType(kind: mttParseError, errorMessage: "EOF while scanning string.")
