@@ -1,4 +1,4 @@
-import pegs
+import pegs, strutils
 
 var lines = @[
     "tuesday",
@@ -7,43 +7,37 @@ var lines = @[
     "[",
     "  ~@",
     "  \"hey \\\"there\"",
-    "  ;heyeyrerer  "]
+    ",",
+    "  ;heyeyrerer  ",
+    ]
 
 
 var p = peg"""
 
-    Token <-  \s * (
+    Token <- Blanks ( { TildeAt / Special / String / Comment / Etc } )
 
-    {'~@'} 
-    
-    /
-    
-    {[\[\]{}()'`~^@]}
+    Blanks <- \s*
+    TildeAt <- '~@'
+    Special <- [\[\]{}()'`~^@]
+    String <- "\"" ("\\" . / [^"])* "\""
+    Comment <- ';' .*
+    Etc <- (!Misc .)+
+    Misc <- \s / '[' / ']' / '{' / '}' / '(' / ['] / '"' / '`' / ',' / ';' / ')'
 
-    /
-
-    { "\"" ("\\" . / [^"])* "\"" }
-
-    /
-
-    { ';' .* }
-
-    /
-
-    { (!NonSpecial .)* }
-    
-    )
-    
-    NonSpecial <- \s / '[' / ']' / '{' / '}' / '(' / ['] / '"' / '`' / ',' / ';' / ')'
-    
     """
 
 
 echo "-------------------------"
 
-for line in lines:
-    echo ">", line
-    if line =~ p:
-        echo matches[0]
-    else:
-        echo ":("
+# for line in lines:
+#     echo ">", line
+#     if line =~ p:
+#         echo matches[0]
+#     else:
+#         echo ":("
+
+
+for substr in findAll(join(lines, " "), p):
+#     echo substr
+# for substr in findAll("   ,   ", p):
+    echo substr
