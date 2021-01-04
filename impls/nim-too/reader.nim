@@ -48,8 +48,7 @@ proc peek(reader: Reader): Token =
 proc tokenize(input: string): seq[Token] =
     result = @[]
     for substr in findAll(input, p):
-        echo "+", substr, "-"
-        result.add(Token(substr))
+        result.add(Token(strip(substr)))
 
 
 proc read_form(reader: var Reader): MalType
@@ -77,13 +76,12 @@ proc read_list(reader: var Reader): MalType =
 proc read_form(reader: var Reader): MalType =
     case peek(reader)[0]
     of '(':
-        return read_list(reader)
+        result = read_list(reader)
     else:
-        return read_atom(reader)
+        result = read_atom(reader)
 
 
 proc read_str*(str: string): MalType =
     var reader: Reader = (tokens: tokenize(str), position: 0)
-    echo "tokens", $ reader.tokens
-    result = read_form(reader)
+    read_form(reader)
 
