@@ -10,7 +10,8 @@ type
         mttNil,
         mttParseError,
         mttStr,
-        mttTrue
+        mttTrue,
+        mttVector
 
 
     MalType* = ref object
@@ -23,6 +24,8 @@ type
             keyVal*: string
         of mttList:
             listVal*: seq[MalType]
+        of mttVector:
+            vectorVal*: seq[MalType]
         of mttParseError:
             errorMessage*: string
         of mttStr:

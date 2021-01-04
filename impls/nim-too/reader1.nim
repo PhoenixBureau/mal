@@ -70,6 +70,19 @@ proc read_list(reader: var Reader): MalType =
     MalType(kind: mttList, listVal: items)
 
 
+proc read_vector(reader: var Reader): MalType =
+    var items : seq[MalType] = @[]
+    discard next(reader)  # Skip the '['.
+    while true:
+        if reader.eof:
+            return MalType(kind: mttParseError, errorMessage: "EOF while scanning vector.")
+        if peek(reader) == "]":
+            discard next(reader)  # Skip the ']'.
+            break
+        items.add(read_form(reader))
+    MalType(kind: mttVector, vectorVal: items)
+
+
 proc read_strlit(reader: var Reader): MalType =
     var tok = next(reader)
     assert tok[0] == '"'
@@ -98,6 +111,7 @@ proc read_form(reader: var Reader): MalType =
         return MalType(kind: mttParseError, errorMessage: "")
     case peek(reader)[0]
     of '(': result = read_list(reader)
+    of '[': result = read_vector(reader)
     of '"': result = read_strlit(reader)
     of ':': result = read_keyword(reader)
     of '\'': result = read_quote(reader, "(quote)")
