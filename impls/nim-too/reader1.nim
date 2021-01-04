@@ -112,17 +112,16 @@ proc read_hashmap(reader: var Reader): MalType =
     MalType(kind: mttHashmap, hashmapVal: items)
 
 
-proc rotten_string(tok: Token): bool =
-    tok.len == 1 or tok[tok.len - 1] != '"' or tok.substr(tok.len - 2) == "\\\""
-
-
 proc read_strlit(reader: var Reader): MalType =
     var tok = next(reader)
     assert tok[0] == '"'
-    if rotten_string(tok):
-        result = MalType(kind: mttParseError, errorMessage: "EOF while scanning string.")
-    else:
-        result = MalType(kind: mttStr, strVal: tok)
+    if tok.len == 1 or tok[tok.len - 1] != '"':
+        return MalType(kind: mttParseError, errorMessage: "EOF while scanning string.")
+    tok = tok.substr(1, tok.len - 2)  # peel off double-quotes
+    tok = tok.replace(r"\n", "\n")    # replace newlines with real newlines
+    tok = tok.replace("\\\\", "\\")   # replace double slashes with slashes
+    
+    result = MalType(kind: mttStr, strVal: tok)
 
 
 proc read_str*(str: string): MalType
