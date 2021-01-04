@@ -8,6 +8,9 @@ SOURCES_BASE = reader.nim types.nim printer.nim
 SRCS = step0_repl.nim step1_read_print.nim
 BINS = $(SRCS:%.nim=%)
 
+NIMOPTS = --debuginfo --linedir:on
+# -d:release
+
 #####################
 
 all: $(BINS)
@@ -18,7 +21,7 @@ mal: $(word $(words $(BINS)),$(BINS))
 	cp $< $@
 
 $(BINS): %: %.nim $(SOURCES_BASE)
-	nim -d:release --nimcache:nimcache-$@ c $@
+	nim $(NIMOPTS)  --nimcache:nimcache-$@ c $@
 
 clean:
 	rm -rf nimcache-*/ $(BINS)
