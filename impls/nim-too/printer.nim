@@ -11,3 +11,5 @@ proc pr_str*(thing: MalType): string =
         result = "(" & join(map(thing.listVal, pr_str), " ") & ")"
     of mttParseError:
         result = thing.errorMessage
+    of mttStr:
+        result = thing.strVal

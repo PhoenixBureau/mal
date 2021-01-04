@@ -5,7 +5,8 @@ type
         mttAtom,
         mttInt,
         mttList,
-        mttParseError
+        mttParseError,
+        mttStr
 
     MalType* = ref object
         case kind*: MalTypeType
@@ -17,4 +18,6 @@ type
             listVal*: seq[MalType]
         of mttParseError:
             errorMessage*: string
+        of mttStr:
+            strVal*: string
 

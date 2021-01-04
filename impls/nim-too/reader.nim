@@ -11,12 +11,13 @@ type
 
 var p = peg"""
 
-    Token <- Blanks ( { TildeAt / Special / String / Comment / Etc } )
+    Token <- Blanks ( { TildeAt / Special / String / BrokenString / Comment / Etc } )
 
     Blanks <- \s*
     TildeAt <- '~@'
     Special <- [\[\]{}()'`~^@]
-    String <- "\"" ("\\" . / [^"])* "\""
+    BrokenString <- '"' ("\\" . / [^"])*
+    String <- BrokenString '"'
     Comment <- ';' .*
     Etc <- (!Misc .)+
     Misc <- \s / '[' / ']' / '{' / '}' / '(' / ['] / '"' / '`' / ',' / ';' / ')'
@@ -46,6 +47,11 @@ proc read_atom(reader: var Reader): MalType =
     var tok = next(reader)
     if tok =~ peg"\d+":
         result = MalType(kind: mttInt, intVal: parseInt(tok))
+    elif tok[0] == '"':
+        if tok.len == 1 or tok[tok.len - 1] != '"':
+            result = MalType(kind: mttParseError, errorMessage: "EOF while scanning string.")
+        else:
+            result = MalType(kind: mttStr, strVal: tok)
     else:
         result = MalType(kind: mttAtom, atomVal: tok)
 
