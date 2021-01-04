@@ -1,7 +1,6 @@
 #####################
 
-SOURCES_BASE = reader.nim
-#  types.nim printer.nim
+SOURCES_BASE = reader.nim types.nim printer.nim
 # SOURCES_REBUILD = $(SOURCES_BASE) env.nim core.nim
 
 #####################

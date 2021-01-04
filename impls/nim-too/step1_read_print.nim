@@ -1,10 +1,12 @@
-import rdstdin, reader
+import rdstdin, printer, reader, types
 
-proc read(str: string): string = str
+proc read(str: string): MalType =
+  read_str(str)
 
-proc eval(ast: string): string = ast
+proc eval(ast: MalType): MalType = ast
 
-proc print(exp: string): string = exp
+proc print(exp: MalType): string = 
+  pr_str(exp)
 
 proc rep(input: string): string =
   print(eval(read(input)))

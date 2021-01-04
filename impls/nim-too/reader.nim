@@ -6,7 +6,7 @@ type
 
   Reader = tuple
     tokens : seq[Token]
-    position: uint
+    position: int
 
 var p = peg"""
 
@@ -79,3 +79,10 @@ proc read_form(reader: var Reader): MalType =
         return read_list(reader)
     else:
         return read_atom(reader)
+
+
+proc read_str*(str: string): MalType =
+    var reader: Reader = (tokens: tokenize(str), position: 0)
+    echo "tokens", $ reader.tokens
+    result = read_form(reader)
+
