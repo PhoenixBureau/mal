@@ -84,8 +84,8 @@ proc read_vector(reader: var Reader): MalType =
 
 
 proc read_hashmap(reader: var Reader): MalType =
-    var items = initTable[string, MalType]()
-    var key: string
+    var items = initTable[MalHashKey, MalType]()
+    var key: MalHashKey
     discard next(reader)  # Skip the '{'.
     while true:
         if reader.eof:
@@ -98,7 +98,9 @@ proc read_hashmap(reader: var Reader): MalType =
         var keyword = read_form(reader)
         case keyword.kind
         of mttKeyword:
-            key = keyword.keyVal
+            key = MalHashKey(kind: mhkKeyword, key: keyword.keyVal)
+        of mttStr:
+            key = MalHashKey(kind: mhkString, key: keyword.strVal)
         else:
             return MalType(kind: mttParseError, errorMessage: "Not a keyword in hashmap.")
 
