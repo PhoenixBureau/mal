@@ -1,4 +1,4 @@
-import pegs, types
+import pegs, strutils, types
 
 type
 
@@ -55,7 +55,11 @@ proc read_form(reader: var Reader): MalType
 
 
 proc read_atom(reader: var Reader): MalType =
-    result = MalType(kind: mttAtom, atomVal: "")
+    var tok = next(reader)
+    if tok =~ peg"\d+":
+        result = MalType(kind: mttInt, intVal: parseInt(tok))
+    else:
+        result = MalType(kind: mttAtom, atomVal: tok)
 
 
 proc read_list(reader: var Reader): MalType =
