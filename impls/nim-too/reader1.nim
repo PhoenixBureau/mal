@@ -82,22 +82,10 @@ proc read_strlit(reader: var Reader): MalType =
 proc read_str*(str: string): MalType
 
 
-proc read_quote(reader: var Reader): MalType =
-    var tok = next(reader)
-    assert tok == "'"
-    let quoted_item = read_form(reader)
-    let quote = read_str("(quote foo)")
-    quote.listVal[1] = quoted_item
-    quote
-
-
-proc read_quasiquote(reader: var Reader): MalType =
-    var tok = next(reader)
-    assert tok == "`"
-    let quoted_item = read_form(reader)
-    let quote = read_str("(quasiquote foo)")
-    quote.listVal[1] = quoted_item
-    quote
+proc read_quote(reader: var Reader, q: string): MalType =
+    discard next(reader)
+    result = read_str(q)
+    result.listVal.add read_form(reader)
 
 
 proc read_form(reader: var Reader): MalType =
@@ -107,9 +95,15 @@ proc read_form(reader: var Reader): MalType =
     case peek(reader)[0]
     of '(': result = read_list(reader)
     of '"': result = read_strlit(reader)
-    of '\'': result = read_quote(reader)
-    of '`': result = read_quasiquote(reader)
-    else: result = read_atom(reader)
+    of '\'': result = read_quote(reader, "(quote)")
+    of '`': result = read_quote(reader, "(quasiquote)")
+    of '~':
+        if peek(reader) == "~@":
+            result = read_quote(reader, "(splice-unquote)")
+        else:
+            result = read_quote(reader, "(unquote)")
+    else:
+        result = read_atom(reader)
 
 
 proc tokens_to_reader(tokens: seq[Token]): Reader =
