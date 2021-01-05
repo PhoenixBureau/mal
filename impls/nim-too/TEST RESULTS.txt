@@ -38,3 +38,20 @@ TEST RESULTS (for ../tests/step1_read_print.mal):
   113: passing tests
   117: total tests
 
+FAILURES:
+FAILED TEST (line 150): "\" -> ['.*(EOF|end of input|unbalanced).*',]:
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '"\\"\n"\\\\"'
+FAILED TEST (line 152): "\\\\\\\\\\\\\\\\\\\" -> ['.*(EOF|end of input|unbalanced).*',]:
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\n"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"'
+SOFT FAILED TEST (line 241): ^{"a" 1} [1 2 3] -> ['',(with-meta [1 2 3] {"a" 1})]:
+    Expected : '.*\n\\(with\\-meta\\ \\[1\\ 2\\ 3\\]\\ \\{"a"\\ 1\\}\\)'
+    Got      : '^{"a" 1} [1 2 3]\n^'
+
+TEST RESULTS (for ../tests/step1_read_print.mal):
+    1: soft failing tests
+    2: failing tests
+  114: passing tests
+  117: total tests
+
