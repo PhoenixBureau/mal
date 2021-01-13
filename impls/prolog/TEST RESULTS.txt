@@ -1,7 +1,7 @@
 TEST RESULTS
  (for ../tests/step1_read_print.mal):
     1: soft failing tests
-    9: failing tests
-  107: passing tests
+    0: failing tests
+  116: passing tests
   117: total tests
 
