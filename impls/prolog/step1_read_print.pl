@@ -13,7 +13,7 @@ iterations of the main loop.  For now it's unused.
 
 loop :-
     prompt(Line),
-    ( loop(Line, [], _Out) | close(user_output) ) 
+    loop(Line, [], _Out).
 
 loop(end_of_file, State, State) :- !.
 loop(Line, In, Out) :-
@@ -127,7 +127,7 @@ netc(0',).
 
 
 read_form(Tokens, AST) :- phrase(read_form(AST), Tokens), !.
-read_form(_, _) :- writeln("EOF reading input."), fail.
+read_form(_, fail) :- writeln("EOF reading input.").
 
 read_form(Mal) --> read_list(Mal) | read_atom(Mal).
 
@@ -143,6 +143,7 @@ read_atom(atom(Atom))  --> [[C|Cs]],
     { atom_codes(Atom, [C|Cs]) }.
 
 
+pr_str(fail) --> [].
 pr_str(int(I)) --> integer(I).
 pr_str(atom(A)) --> {atom_codes(A, Codes)}, Codes.
 pr_str(comment(C)) --> comment(comment(C)).
