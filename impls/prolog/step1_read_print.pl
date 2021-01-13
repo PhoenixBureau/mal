@@ -11,7 +11,7 @@ iterations of the main loop.  For now it's unused.
 
 loop :-
     prompt(Line),
-    ( loop(Line, [], _Out) | halt ).
+    ( loop(Line, [], _Out) | true ).
 
 loop(end_of_file, State, State) :- !.
 loop(Line, In, Out) :-
@@ -93,6 +93,7 @@ special('@') --> "@".
 
 string_lit([34|S]) --> [34], strchrs(S, [34]), [34].
 
+strchrs([92, 34|Tail], Tail0) --> "\\\"", strchrs(Tail, Tail0).
 strchrs([Ch|Tail], Tail0) --> [Ch], {schr(Ch)}, strchrs(Tail, Tail0).
 strchrs(Tail, Tail) --> [].
 
