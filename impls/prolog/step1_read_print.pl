@@ -40,7 +40,7 @@ write_codes(C) :-
 
 read_(Codes, AST) :-
     phrase(tokens(Tokens), Codes),
-    phrase(read_form(AST), Tokens).
+    read_form(Tokens, AST).
 
 eval --> !.
 
@@ -123,6 +123,9 @@ netc(0',).
 
 %-----------------------------------
 
+
+read_form(Tokens, AST) :- phrase(read_form(AST), Tokens), !.
+read_form(_, _) :- writeln("EOF reading input."), fail.
 
 read_form(Mal) --> read_list(Mal) | read_atom(Mal).
 
