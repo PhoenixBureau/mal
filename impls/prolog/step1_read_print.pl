@@ -41,7 +41,7 @@ write_codes(C) :-
 
 
 read_(Codes, AST) :-
-    phrase(tokens(Tokens), Codes),
+    tokenize(Codes, Tokens),
     read_form(Tokens, AST).
 
 eval --> !.
@@ -57,6 +57,8 @@ rep --> read_, eval, print.
 %-----------------------------------
 /* Tokenise it, don't critize it. */
 
+tokenize(Codes, Tokens) :- phrase(tokens(Tokens), Codes), !.
+tokenize(_, fail) :- writeln("EOF scanning input for tokens.").
 
 % Greedy up tokens ignoring blanks and commas.
 tokens([T|Ts]) --> token(T), !, tokens(Ts).
@@ -68,7 +70,7 @@ token(Tok) -->
     blanks_or_commas,
     ( tildeAt(Tok)
     | special(Tok)
-    | string_lit(Tok)
+    | [34], !, string_lit(Tok)
     | comment(Tok)
     | etcs(Tok)
     ).
@@ -93,7 +95,7 @@ special('~') --> "~".
 special('^') --> "^".
 special('@') --> "@".
 
-string_lit([34|S]) --> [34], strchrs(S, [34]), [34].
+string_lit([34|S]) --> strchrs(S, [34]), [34].
 
 strchrs([92, 34|Tail], Tail0) --> "\\\"", strchrs(Tail, Tail0).
 strchrs([Ch|Tail], Tail0) --> [Ch], {schr(Ch)}, strchrs(Tail, Tail0).
@@ -126,8 +128,9 @@ netc(0',).
 %-----------------------------------
 
 
+read_form(fail, fail) :- !.  % Pass through tokenizer failures.
 read_form(Tokens, AST) :- phrase(read_form(AST), Tokens), !.
-read_form(_, fail) :- writeln("EOF reading input.").
+read_form(_, fail) :- writeln("EOF parsing tokens to AST.").
 
 read_form(Mal) --> read_list(Mal) | read_atom(Mal).
 
