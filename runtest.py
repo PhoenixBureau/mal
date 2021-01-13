@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-import os, sys, re
+import os, sys, re, traceback
 import argparse, time
 import signal, atexit
 
@@ -247,6 +247,7 @@ def assert_prompt(runner, prompts, timeout):
 try:
     assert_prompt(r, ['[^\s()<>]+> '], args.start_timeout)
 except:
+    traceback.print_exc()
     _, exc, _ = sys.exc_info()
     log("\nException: %s" % repr(exc))
     log("Output before exception:\n%s" % r.buf)
@@ -323,6 +324,7 @@ while t.next():
                         t.ret, repr(expects[0]), repr(res))
             failures.append(failed_test)
     except:
+        traceback.print_exc()
         _, exc, _ = sys.exc_info()
         log("\nException: %s" % repr(exc))
         log("Output before exception:\n%s" % r.buf)
