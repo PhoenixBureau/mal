@@ -109,7 +109,7 @@ schr(Ch) :- nonvar(Ch), Ch \= 34, Ch \= 92.
 
 comment(comment(C)) --> ";", rest(C).
 
-rest(X, X, X).  % DCG to grab the rest of the list/line.
+rest(X, X, []).  % DCG to grab the rest of the list/line.
 
 % Match one-or-more (not zero-or-more because that would match the end of
 % the list/line infinitely many times leading to a non-halting program)
@@ -120,10 +120,15 @@ etcs([Ch]) --> etc(Ch).
 % etc//1 defines the set of chars that are NOT in netc//1.
 etc(Ch) --> [Ch], { nonvar(Ch), \+ netc(Ch) }.
 
-% netc//1 are spaces, commas, and the above special chars.
+% netc//1 are spaces, commas, semicolons, double quotes, and the above
+% special chars.
+
 netc(Ch) :- code_type(Ch, space).
 netc(Ch) :- special(_, [Ch], []).
 netc(0',).
+netc(0';).
+netc(34).
+
 
 % Reusing special//1 as special/3 is a neat trick.  The same code is a
 % parser and a database of the grammar.  Yay Prolog!
@@ -136,7 +141,9 @@ read_form(fail, fail) :- !.  % Pass through tokenizer failures.
 read_form(Tokens, AST) :- phrase(read_form(AST), Tokens), !.
 read_form(_, fail) :- writeln("EOF parsing tokens to AST.").
 
-read_form(Mal) --> read_list(Mal) | read_atom(Mal).
+read_form(Mal) -->
+    (read_list(Mal) | read_atom(Mal)),
+    ([comment(_)] | []).
 
 read_list(mal_list(M)) --> ['('], read_list_(M), [')'].
 
@@ -153,7 +160,6 @@ read_atom(atom(Atom))  --> [[C|Cs]],
 pr_str(fail) --> [].
 pr_str(int(I)) --> integer(I).
 pr_str(atom(A)) --> {atom_codes(A, Codes)}, Codes.
-pr_str(comment(C)) --> comment(comment(C)).
 pr_str(mal_list(ML)) --> "(", pr_s(ML), ")", !.
 
 pr_s([]) --> [].
