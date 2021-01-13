@@ -49,7 +49,7 @@ rep --> read_, eval, print.
 :- use_module(library(dcg/basics)).
 
 tokens([T|Ts]) --> token(T), !, tokens(Ts).
-tokens([]) --> [].
+tokens([]) --> blanks_or_commas.
 
 token(Tok) -->
     blanks_or_commas,
