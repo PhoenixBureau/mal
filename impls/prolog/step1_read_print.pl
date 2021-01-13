@@ -177,6 +177,8 @@ read_quote(mal_list([atom(unquote),          Q])) --> ['~'], read_form(Q).
 read_quote(mal_list([atom('splice-unquote'), Q])) --> ['~@'], read_form(Q).
 read_quote(mal_list([atom(deref),            Q])) --> ['@'], read_form(Q).
 
+read_quote(mal_list([atom('with-meta'), R, Q])) --> ['^'], read_form(Q), read_form(R).
+
 read_atom(int(N))  --> [Codes],
     { integer(N, Codes, []) }, !.
 
