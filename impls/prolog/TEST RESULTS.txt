@@ -17,3 +17,8 @@ TEST RESULTS (for ../tests/step1_read_print.mal):
    85: passing tests
   117: total tests
 
+TEST RESULTS (for ../tests/step1_read_print.mal):
+    2: soft failing tests
+   26: failing tests
+   89: passing tests
+  117: total tests
