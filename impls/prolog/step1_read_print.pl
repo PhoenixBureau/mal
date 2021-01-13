@@ -100,6 +100,7 @@ string_lit([34|S]) --> strchrs(S, [34]), [34].
 
 strchrs([92, 92|Tail], Tail0) --> [92, 92], !, strchrs(Tail, Tail0).
 strchrs([92, 34|Tail], Tail0) --> [92, 34], !, strchrs(Tail, Tail0).
+strchrs([92, 110|Tail], Tail0) --> [92, 110], !, strchrs(Tail, Tail0).
 
 strchrs([Ch|Tail], Tail0) --> [Ch], {schr(Ch)}, strchrs(Tail, Tail0).
 
