@@ -1,3 +1,4 @@
+:- use_module(library(assoc)).
 :- use_module(library(dcg/basics)).
 
 % :- initialization(loop).
@@ -145,6 +146,7 @@ read_form(_, fail) :- writeln("EOF parsing tokens to AST.").
 read_form(Mal) -->
     ( read_list(Mal)
     | read_vect(Mal)
+    | read_hashmap(Mal)
     | read_keyword(Mal)
     | read_atom(Mal)
     ),
@@ -155,6 +157,15 @@ read_vect(mal_vect(M)) --> ['['], read_list_(M), [']'].
 
 read_list_([M|Ms]) --> read_form(M), read_list_(Ms).
 read_list_([]) --> [].
+
+read_hashmap(mal_hashmap(H)) --> ['{'], read_hashmap_(H), ['}'].
+
+read_hashmap_(H) -->
+    read_form(Key),
+    read_form(Value),
+    read_hashmap_(Hs),
+    { put_assoc(Key, Hs, Value, H) }.
+read_hashmap_(t) --> [].
 
 read_keyword(keyword(K)) --> [[0':|Codes]], 
     { atom_codes(K, Codes) }.
@@ -175,7 +186,17 @@ pr_str(atom(A)) --> {atom_codes(A, Codes)}, Codes.
 pr_str(keyword(K)) --> {atom_codes(K, Codes)}, [0':|Codes].
 pr_str(mal_list(ML)) --> "(", pr_s(ML), ")".
 pr_str(mal_vect(ML)) --> "[", pr_s(ML), "]".
+pr_str(mal_hashmap(HM)) --> "{", pr_hm(HM), "}".
 
 pr_s([]) --> [].
 pr_s([Head]) --> pr_str(Head), [].
 pr_s([Head|[X|Xs]]) --> pr_str(Head), " ", pr_s([X|Xs]).
+
+pr_hm(t) --> !.
+pr_hm(t(K, V, _, U, D)) -->
+    pr_str(K), " ", pr_str(V),
+    pr_hm_(U),
+    pr_hm_(D).
+
+pr_hm_(t) --> !.
+pr_hm_(t(K, V, Z, U, D)) --> " ", pr_hm(t(K, V, Z, U, D)).
