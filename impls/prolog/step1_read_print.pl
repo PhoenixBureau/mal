@@ -145,6 +145,7 @@ read_form(_, fail) :- writeln("EOF parsing tokens to AST.").
 read_form(Mal) -->
     ( read_list(Mal)
     | read_vect(Mal)
+    | read_keyword(Mal)
     | read_atom(Mal)
     ),
     ([comment(_)] | []).  % Absorb a comment, if any.
@@ -155,16 +156,23 @@ read_vect(mal_vect(M)) --> ['['], read_list_(M), [']'].
 read_list_([M|Ms]) --> read_form(M), read_list_(Ms).
 read_list_([]) --> [].
 
+read_keyword(keyword(K)) --> [[0':|Codes]], 
+    { atom_codes(K, Codes) }.
+
 read_atom(int(N))  --> [Codes],
     { integer(N, Codes, []) }, !.
 
 read_atom(atom(Atom))  --> [[C|Cs]],
-    { atom_codes(Atom, [C|Cs]) }.
+    { nonvar(C)
+    , C \= 0':
+    , atom_codes(Atom, [C|Cs])
+    }.
 
 
 pr_str(fail) --> [].
 pr_str(int(I)) --> integer(I).
 pr_str(atom(A)) --> {atom_codes(A, Codes)}, Codes.
+pr_str(keyword(K)) --> {atom_codes(K, Codes)}, [0':|Codes].
 pr_str(mal_list(ML)) --> "(", pr_s(ML), ")".
 pr_str(mal_vect(ML)) --> "[", pr_s(ML), "]".
 
