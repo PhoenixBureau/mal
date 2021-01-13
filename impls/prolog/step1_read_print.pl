@@ -91,7 +91,12 @@ special('~') --> "~".
 special('^') --> "^".
 special('@') --> "@".
 
-string_lit("") --> [34], [34].
+string_lit([34|S]) --> [34], strchrs(S, [34]), [34].
+
+strchrs([Ch|Tail], Tail0) --> [Ch], {schr(Ch)}, strchrs(Tail, Tail0).
+strchrs(Tail, Tail) --> [].
+
+schr(Ch) :- nonvar(Ch), Ch \= 34.
 
 comment(comment(C)) --> ";", rest(C).
 
