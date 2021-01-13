@@ -11,7 +11,7 @@ iterations of the main loop.  For now it's unused.
 
 loop :-
     prompt(Line),
-    loop(Line, [], _Out).
+    ( loop(Line, [], _Out) | halt ).
 
 loop(end_of_file, State, State) :- !.
 loop(Line, In, Out) :-
