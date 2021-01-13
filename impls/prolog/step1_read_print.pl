@@ -49,7 +49,7 @@ eval --> !.
 
 print(AST, Codes) :-
     % writeln(AST),  % debugging.
-    phrase(pr_str(AST), Codes).
+    phrase(pr_str(AST), Codes), !.
 
 rep --> read_, eval, print.
 
@@ -143,10 +143,14 @@ read_form(Tokens, AST) :- phrase(read_form(AST), Tokens), !.
 read_form(_, fail) :- writeln("EOF parsing tokens to AST.").
 
 read_form(Mal) -->
-    (read_list(Mal) | read_atom(Mal)),
-    ([comment(_)] | []).
+    ( read_list(Mal)
+    | read_vect(Mal)
+    | read_atom(Mal)
+    ),
+    ([comment(_)] | []).  % Absorb a comment, if any.
 
 read_list(mal_list(M)) --> ['('], read_list_(M), [')'].
+read_vect(mal_vect(M)) --> ['['], read_list_(M), [']'].
 
 read_list_([M|Ms]) --> read_form(M), read_list_(Ms).
 read_list_([]) --> [].
@@ -161,7 +165,8 @@ read_atom(atom(Atom))  --> [[C|Cs]],
 pr_str(fail) --> [].
 pr_str(int(I)) --> integer(I).
 pr_str(atom(A)) --> {atom_codes(A, Codes)}, Codes.
-pr_str(mal_list(ML)) --> "(", pr_s(ML), ")", !.
+pr_str(mal_list(ML)) --> "(", pr_s(ML), ")".
+pr_str(mal_vect(ML)) --> "[", pr_s(ML), "]".
 
 pr_s([]) --> [].
 pr_s([Head]) --> pr_str(Head), [].
