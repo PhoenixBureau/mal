@@ -12,8 +12,9 @@ iterations of the main loop.  For now it's unused.
 */
 
 loop :-
-    prompt(Line),
-    loop(Line, [], _Out).
+    prompt(Line),            % Get the first line of user input,
+    loop(Line, [], _Out).    % and drop intot the main loop with
+                             % an empty list as initial state.
 
 loop(end_of_file, State, State) :- !.
 loop(Line, In, Out) :-
@@ -97,11 +98,14 @@ special('@') --> "@".
 
 string_lit([34|S]) --> strchrs(S, [34]), [34].
 
-strchrs([92, 34|Tail], Tail0) --> "\\\"", strchrs(Tail, Tail0).
+strchrs([92|Tail], Tail0) --> [92, 92], strchrs(Tail, Tail0).
+strchrs([34|Tail], Tail0) --> [92, 34], strchrs(Tail, Tail0).
+
 strchrs([Ch|Tail], Tail0) --> [Ch], {schr(Ch)}, strchrs(Tail, Tail0).
+
 strchrs(Tail, Tail) --> [].
 
-schr(Ch) :- nonvar(Ch), Ch \= 34.
+schr(Ch) :- nonvar(Ch), Ch \= 34, Ch \= 92.
 
 comment(comment(C)) --> ";", rest(C).
 
