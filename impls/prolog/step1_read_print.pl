@@ -148,6 +148,7 @@ read_form(Mal) -->
     | read_vect(Mal)
     | read_hashmap(Mal)
     | read_keyword(Mal)
+    | read_quote(Mal)
     | read_atom(Mal)
     ),
     ([comment(_)] | []).  % Absorb a comment, if any.
@@ -169,6 +170,12 @@ read_hashmap_(t) --> [].
 
 read_keyword(keyword(K)) --> [[0':|Codes]], 
     { atom_codes(K, Codes) }.
+
+read_quote(mal_list([atom(quote),            Q])) --> [single_quote], read_form(Q).
+read_quote(mal_list([atom(quasiquote),       Q])) --> ['`'], read_form(Q).
+read_quote(mal_list([atom(unquote),          Q])) --> ['~'], read_form(Q).
+read_quote(mal_list([atom('splice-unquote'), Q])) --> ['~@'], read_form(Q).
+read_quote(mal_list([atom(deref),            Q])) --> ['@'], read_form(Q).
 
 read_atom(int(N))  --> [Codes],
     { integer(N, Codes, []) }, !.
