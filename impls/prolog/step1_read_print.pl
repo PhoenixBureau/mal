@@ -47,7 +47,7 @@ read_(Codes, AST) :-
 eval --> !.
 
 print(AST, Codes) :-
-    writeln(AST),  % debugging.
+    % writeln(AST),  % debugging.
     phrase(pr_str(AST), Codes).
 
 rep --> read_, eval, print.
