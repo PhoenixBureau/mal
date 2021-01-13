@@ -1,6 +1,8 @@
 :- use_module(library(dcg/basics)).
 
-:- initialization(loop).
+% :- initialization(loop).
+
+% swipl --quiet -t loop step1_read_print.pl 
 
 /*
 
@@ -11,7 +13,7 @@ iterations of the main loop.  For now it's unused.
 
 loop :-
     prompt(Line),
-    ( loop(Line, [], _Out) | halt ).
+    loop(Line, [], _Out).
 
 loop(end_of_file, State, State) :- !.
 loop(Line, In, Out) :-
