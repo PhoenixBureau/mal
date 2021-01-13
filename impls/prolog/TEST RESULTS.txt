@@ -1,0 +1,19 @@
+TEST RESULTS
+ (for ../tests/step1_read_print.mal):
+    3: soft failing tests
+   30: failing tests
+   84: passing tests
+  117: total tests
+
+TEST RESULTS (for ../tests/step1_read_print.mal):
+    5: soft failing tests
+   31: failing tests
+   81: passing tests
+  117: total tests
+
+TEST RESULTS (for ../tests/step1_read_print.mal):
+    4: soft failing tests
+   28: failing tests
+   85: passing tests
+  117: total tests
+
