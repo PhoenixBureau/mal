@@ -1,4 +1,5 @@
 :- use_module(library(assoc)).
+:- use_module(library(clpfd)).
 :- use_module(library(dcg/basics)).
 
 % :- initialization(loop).
@@ -12,10 +13,20 @@ iterations of the main loop.  For now it's unused.
 
 */
 
+% add_def_to_env
+e(Key, Value, Assoc0, Assoc) :-
+    put_assoc(Key, Assoc0, Value, Assoc).
+
+env -->  % Symbol, (list of args)-(result AST).
+    e('+', [int(A), int(B)]-int(A+B)),
+    e('-', [int(A), int(B)]-int(A-B)),
+    e('*', [int(A), int(B)]-int(A*B)),
+    e('/', [int(A), int(B)]-int(A/B)).
+
 loop :-
-    prompt(Line),            % Get the first line of user input,
-    loop(Line, [], _Out).    % and drop intot the main loop with
-                             % an empty list as initial state.
+    prompt(Line),            % Get the first line of user input
+    env(t, Env),             % and the initial environment,
+    loop(Line, Env, _Out).   % and drop into the main loop.
 
 loop(end_of_file, State, State) :- !.
 loop(Line, In, Out) :-
@@ -23,8 +34,8 @@ loop(Line, In, Out) :-
   prompt(NextLine),
   loop(NextLine, State, Out).
 
-do_line(Line, _, _) :-
-    rep(Line, Output),
+do_line(Line, Env, Env) :-
+    rep(Env, Line, Output),
     write_codes(Output).
 
 prompt(Codes) :-
@@ -46,13 +57,46 @@ read_(Codes, AST) :-
     tokenize(Codes, Tokens),
     read_form(Tokens, AST).
 
-eval --> !.
+eval(_, mal_list([]), mal_list([])) :- !.
+
+eval(Env, mal_list([FName|Args0]), G) :- !,
+    eval_ast(mal_list([FName|Args0]), Env, mal_list([Args-G|Args])).
+
+eval(Env, AST0, AST) :- eval_ast(AST0, Env, AST).
 
 print(AST, Codes) :-
     % writeln(AST),  % debugging.
     phrase(pr_str(AST), Codes), !.
 
-rep --> read_, eval, print.
+malo(_, []).
+
+
+rep(Env) -->
+    read_,
+    ( eval(Env) ->
+      print
+    ; malo ).
+
+
+% eval_ast(AST0, Env, AST).
+
+eval_ast(atom(A), Env, Value) :-
+    ( get_assoc(A, Env, Value) ->
+       true
+    ;
+       write("Unknown thing "), writeln(A), fail, !
+    ).
+
+eval_ast(int(I), _, int(I)).
+eval_ast(keyword(K), _, keyword(K)).
+eval_ast(mal_vect(ML), _, mal_vect(ML)).
+eval_ast(mal_hashmap(HM), _, mal_hashmap(HM)).
+
+eval_ast(mal_list([ML0|ML0s]), Env, mal_list([ML|MLs])) :-
+    eval(Env, ML0, ML),
+    eval_ast(mal_list(ML0s), Env, mal_list(MLs)).
+eval_ast(mal_list([]), _, mal_list([])).
+
 
 
 
@@ -190,7 +234,8 @@ read_atom(atom(Atom))  --> [[C|Cs]],
 
 
 pr_str(fail) --> [].
-pr_str(int(I)) --> integer(I).
+pr_str(int(I)) --> { integer(I) }, integer(I).
+pr_str(int(Expr)) --> { term_to_atom(Expr, Atom), atom_codes(Atom, Codes) }, Codes.
 pr_str(atom(A)) --> {atom_codes(A, Codes)}, Codes.
 pr_str(keyword(K)) --> {atom_codes(K, Codes)}, [0':|Codes].
 pr_str(mal_list(ML)) --> "(", pr_s(ML), ")".
