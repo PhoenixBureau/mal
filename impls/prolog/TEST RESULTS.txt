@@ -1,6 +1,7 @@
 TEST RESULTS
- (for ../tests/step1_read_print.mal):
+ (for ../tests/step2_eval.mal):
     0: soft failing tests
-    0: failing tests
-  117: passing tests
-  117: total tests
+    3: failing tests
+   11: passing tests
+   14: total tests
+
