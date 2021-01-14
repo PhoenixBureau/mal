@@ -103,7 +103,6 @@ eval_ast(atom(A), Env, Value) :-
 
 eval_ast(int(I), _, int(I)).
 eval_ast(keyword(K), _, keyword(K)).
-eval_ast(mal_hashmap(HM), _, mal_hashmap(HM)).
 
 eval_ast(mal_list([ML0|ML0s]), Env, mal_list([ML|MLs])) :-
     eval(Env, ML0, ML),
@@ -115,6 +114,11 @@ eval_ast(mal_vect([ML0|ML0s]), Env, mal_vect([ML|MLs])) :-
     eval_ast(mal_vect(ML0s), Env, mal_vect(MLs)).
 eval_ast(mal_vect([]), _, mal_vect([])).
 
+eval_ast(mal_hashmap(t), _, mal_hashmap(t)).
+eval_ast(mal_hashmap(t(K, V0, Z, U0, D0)), Env, mal_hashmap(t(K, V, Z, U, D))) :-
+    eval(Env, V0, V),
+    eval_ast(mal_hashmap(U0), Env, mal_hashmap(U)),
+    eval_ast(mal_hashmap(D0), Env, mal_hashmap(D)).
 
 
 
