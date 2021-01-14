@@ -17,11 +17,17 @@ iterations of the main loop.  For now it's unused.
 e(Key, Value, Assoc0, Assoc) :-
     put_assoc(Key, Assoc0, Value, Assoc).
 
-env -->  % Symbol, (list of args)-(result AST).
-    e('+', [int(A), int(B)]-int(A+B)),
-    e('-', [int(A), int(B)]-int(A-B)),
-    e('*', [int(A), int(B)]-int(A*B)),
-    e('/', [int(A), int(B)]-int(A/B)).
+env -->  % Symbol, (list of args)-(result AST)-implementation.
+    e('+', [int(A), int(B)]-int(C)-f('+', A, B, C)),
+    e('-', [int(A), int(B)]-int(C)-f('-', A, B, C)),
+    e('*', [int(A), int(B)]-int(C)-f('*', A, B, C)),
+    e('/', [int(A), int(B)]-int(C)-f('/', A, B, C)).
+
+f('+', A, B, C) :- C #= A + B.
+f('-', A, B, C) :- C #= A - B.
+f('*', A, B, C) :- C #= A * B.
+f('/', A, B, C) :- C #= A // B.
+
 
 loop :-
     prompt(Line),            % Get the first line of user input
@@ -59,8 +65,14 @@ read_(Codes, AST) :-
 
 eval(_, mal_list([]), mal_list([])) :- !.
 
-eval(Env, mal_list([FName|Args0]), G) :- !,
-    eval_ast(mal_list([FName|Args0]), Env, mal_list([Args-G|Args])).
+eval(Env, mal_list([FName|Args0]), AST) :- !,
+    eval_ast(
+        mal_list([FName|Args0]),
+        Env,
+        mal_list([Args-AST-Impl|Args])  % Unify rest of list with Args
+    ),
+    clause(Impl, Body),
+    call(Body).
 
 eval(Env, AST0, AST) :- eval_ast(AST0, Env, AST).
 
