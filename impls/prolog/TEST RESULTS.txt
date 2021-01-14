@@ -1,7 +1,6 @@
 TEST RESULTS
  (for ../tests/step2_eval.mal):
     0: soft failing tests
-    3: failing tests
-   11: passing tests
+    0: failing tests
+   14: passing tests
    14: total tests
-
