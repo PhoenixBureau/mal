@@ -69,8 +69,10 @@ eval(Env, mal_list([FName|Args0]), AST) :- !,
     eval_ast(
         mal_list([FName|Args0]),
         Env,
-        mal_list([Args-AST-Impl|Args])  % Unify rest of list with Args
+        mal_list([Functor|Args])
     ),
+    % Unify rest of list with Args, copy term to get fresh vars.
+    copy_term(Functor, Args-AST-Impl),
     clause(Impl, Body),
     call(Body).
 
